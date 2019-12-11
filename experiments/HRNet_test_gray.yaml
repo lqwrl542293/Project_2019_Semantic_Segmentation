@@ -1,0 +1,90 @@
+ROOT: '/home/zyw/code/hrnet/dataset/Potsdam/train/splitdata'
+EXPNAME: 'HRNet_v2_noSyncBN_noPretrain_new3'
+train: False
+USESYNCBN: False
+CUDNN:
+  BENCHMARK: true
+  DETERMINISTIC: false
+  ENABLED: true
+
+DATASET:
+  NUM_CLASSES: 6
+MODEL:
+  NAME: 'seg_hrnet'
+  PRETRAINED: '/home/zyw/code/hrnet/weights/HRNet_v2_noSyncBN_noPretrain_new2.th'
+  EXTRA:
+    FINAL_CONV_KERNEL: 1
+    STAGE1:
+      NUM_MODULES: 1
+      NUM_RANCHES: 1
+      BLOCK: BOTTLENECK
+      NUM_BLOCKS:
+        - 2
+      NUM_CHANNELS:
+        - 64
+      FUSE_METHOD: SUM
+    STAGE2:
+      NUM_MODULES: 1
+      NUM_BRANCHES: 2
+      BLOCK: BASIC
+      NUM_BLOCKS:
+        - 2
+        - 2
+      NUM_CHANNELS:
+        - 18
+        - 36
+      FUSE_METHOD: SUM
+    STAGE3:
+      NUM_MODULES: 3
+      NUM_BRANCHES: 3
+      BLOCK: BASIC
+      NUM_BLOCKS:
+        - 2
+        - 2
+        - 2
+      NUM_CHANNELS:
+        - 18
+        - 36
+        - 72
+      FUSE_METHOD: SUM
+    STAGE4:
+      NUM_MODULES: 2
+      NUM_BRANCHES: 4
+      BLOCK: BASIC
+      NUM_BLOCKS:
+        - 2
+        - 2
+        - 2
+        - 2
+      NUM_CHANNELS:
+        - 18
+        - 36
+        - 72
+        - 144
+      FUSE_METHOD: SUM
+TRAIN:
+  OPTIMIZER: 'sgd'
+  CARD_NUM : 4
+  IMAGE_SIZE:
+  - 512
+  - 512
+  BATCHSIZE_PER_CARD: 16
+  TOTALEPOCH: 400
+  LR: 1e-2
+  WD: 5e-4
+  MOMENTUM : 0.9
+  # LR: 0.0002
+  LOSS: 'CrossEntropy'
+  TRAINCLASS: -1
+  RESUME: True
+  RESUME_START: 69
+  NUM_WORKERS: 16
+TEST:
+  LABEL_LIST: [0,1,2,3,4,5]
+  ROOT: '/home/zyw/code/hrnet/dataset/Potsdam/test/'
+  WEIGTH: '/home/zyw/code/hrnet/weights/HRNet_v2_noSyncBN_noPretrain_new3.th'
+  IMAGE_SIZE: 1024
+  BASE_SIZE: 2048
+  BATCH_SIZE_PER_GPU: 4
+  FLIP_TEST: false
+  MULTI_SCALE: false
